@@ -3,17 +3,16 @@ package com.hex.hex.application.port.out;
 import com.hex.hex.domain.model.Pedido;
 
 /**
- * 🚪 PUERTO DE SALIDA (OUTBOUND PORT):
+ * 🔌 Puerto de salida: GuardarPedidoPort
  *
- * Define qué necesita el caso de uso del "mundo exterior".
- * En este caso, el caso de uso necesita poder GUARDAR un pedido.
+ * Define la operación para persistir un pedido en la base de datos o cualquier sistema externo.
  *
- * El puerto de salida es una interfaz → define un contrato sin depender
- * de la tecnología de persistencia.
- *
- * Los adaptadores (como los que usan JPA o una API externa) implementan esta interfaz.
+ * En la arquitectura hexagonal:
+ * - Este puerto se implementará en un "adaptador de salida" (por ejemplo, usando JPA).
+ * - Así, el servicio de aplicación no conoce la tecnología usada para guardar.
  */
 public interface GuardarPedidoPort {
     Pedido guardar(Pedido pedido);
 }
+
 

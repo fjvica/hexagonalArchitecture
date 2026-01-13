@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HexApplication {
+public class TiendaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HexApplication.class, args);
+		SpringApplication.run(TiendaApplication.class, args);
 	}
 
 }

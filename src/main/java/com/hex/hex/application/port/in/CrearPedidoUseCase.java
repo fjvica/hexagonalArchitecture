@@ -3,19 +3,20 @@ package com.hex.hex.application.port.in;
 import com.hex.hex.domain.model.Pedido;
 
 /**
- * 🚪 PUERTO DE ENTRADA (INBOUND PORT):
+ * 🚪 Puerto de entrada: CrearPedidoUseCase
  *
- * Este puerto define un "caso de uso" del sistema.
- * Representa una acción que el mundo exterior (por ejemplo, un controlador REST o un CLI)
- * puede solicitar a la aplicación.
+ * Define el "contrato" o interfaz de un caso de uso del sistema.
  *
- * El puerto es una interfaz → la implementación real estará en el servicio de aplicación.
+ * En la arquitectura hexagonal:
+ * - Representa algo que el mundo exterior (por ejemplo, un controlador REST)
+ *   puede pedirle a la aplicación.
+ * - No sabe cómo se implementa.
  *
- * El uso de interfaces aquí es esencial para desacoplar:
- *  - El controlador REST no necesita saber cómo se crea un pedido.
- *  - Solo necesita llamar a "crearPedido()".
+ * Esta interfaz se implementará dentro de la capa de aplicación
+ * (en un servicio con la lógica concreta).
  */
 public interface CrearPedidoUseCase {
-    Pedido crearPedido(String cliente);
+    Pedido crearPedido(Long clienteId);
 }
+
 

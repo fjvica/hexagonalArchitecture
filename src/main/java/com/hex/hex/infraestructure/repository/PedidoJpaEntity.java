@@ -3,14 +3,16 @@ package com.hex.hex.infraestructure.repository;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+
 /**
- * 🧱 ENTIDAD JPA (detalle de infraestructura):
+ * 🧱 Entidad JPA: PedidoJpaEntity
  *
- * Representa cómo se almacena un Pedido en la base de datos.
+ * Representa cómo se almacena un pedido en la base de datos.
  *
- * Esta clase pertenece al "lado derecho" del hexágono (infraestructura).
- *
- * No debe usarse directamente en la lógica de negocio.
+ * ▶️ Importante:
+ * - Esta clase pertenece exclusivamente a la capa de infraestructura.
+ * - No se usa en el dominio ni en la capa de aplicación.
+ * - Es un detalle técnico, dependiente de JPA.
  */
 @Entity
 @Table(name = "pedidos")
@@ -20,20 +22,34 @@ public class PedidoJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String cliente;
+    // Referencia al cliente (solo guardamos su ID)
+    private Long clienteId;
+
     private LocalDate fecha;
 
-    // Constructor protegido requerido por JPA
+    // Estado del pedido (guardado como texto)
+    private String estado;
+
+    // Constructor vacío necesario para JPA
     protected PedidoJpaEntity() {}
 
-    public PedidoJpaEntity(Long id, String cliente, LocalDate fecha) {
+    public PedidoJpaEntity(Long id, Long clienteId, LocalDate fecha, String estado) {
         this.id = id;
-        this.cliente = cliente;
+        this.clienteId = clienteId;
         this.fecha = fecha;
+        this.estado = estado;
     }
 
+    // Getters y Setters
     public Long getId() { return id; }
-    public String getCliente() { return cliente; }
+    public Long getClienteId() { return clienteId; }
     public LocalDate getFecha() { return fecha; }
+    public String getEstado() { return estado; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public void setEstado(String estado) { this.estado = estado; }
 }
+
 

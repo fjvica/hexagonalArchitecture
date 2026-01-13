@@ -1,35 +1,73 @@
 package com.hex.hex.infraestructure.adapter.in;
 
+import com.hex.hex.application.port.in.AñadirProductoUseCase;
+import com.hex.hex.application.port.in.CancelarPedidoUseCase;
+import com.hex.hex.application.port.in.ConfirmarPedidoUseCase;
 import com.hex.hex.application.port.in.CrearPedidoUseCase;
 import com.hex.hex.domain.model.Pedido;
 import org.springframework.web.bind.annotation.*;
 
+
 /**
- * 🌐 ADAPTADOR DE ENTRADA (INBOUND ADAPTER):
+ * 🌐 Adaptador de entrada: PedidoRestController
  *
- * Expone la aplicación al mundo exterior (en este caso, vía HTTP REST).
+ * Expone los casos de uso del sistema a través de una API REST.
  *
- * Recibe peticiones, las traduce al modelo de aplicación, y delega el trabajo al caso de uso
- * a través del puerto de entrada (CrearPedidoUseCase).
+ * ▶️ Función:
+ * - Recibe solicitudes HTTP.
+ * - Convierte los parámetros en tipos adecuados.
+ * - Invoca los puertos de entrada (casos de uso).
+ * - Devuelve respuestas al cliente.
  *
- * El controlador no contiene lógica de negocio. Su función es conectar el exterior con el núcleo.
+ * ▶️ Importante:
+ * - No contiene lógica de negocio (eso vive en el dominio).
+ * - No conoce la infraestructura de persistencia ni frameworks de bajo nivel.
  */
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoRestController {
 
     private final CrearPedidoUseCase crearPedidoUseCase;
+    private final AñadirProductoUseCase añadirProductoUseCase;
+    private final ConfirmarPedidoUseCase confirmarPedidoUseCase;
+    private final CancelarPedidoUseCase cancelarPedidoUseCase;
 
-    // Se inyecta el puerto de entrada (interfaz del caso de uso),
-    // no la implementación concreta → mantiene el desacoplamiento.
-    public PedidoRestController(CrearPedidoUseCase crearPedidoUseCase) {
+    public PedidoRestController(CrearPedidoUseCase crearPedidoUseCase,
+                                AñadirProductoUseCase añadirProductoUseCase,
+                                ConfirmarPedidoUseCase confirmarPedidoUseCase,
+                                CancelarPedidoUseCase cancelarPedidoUseCase) {
         this.crearPedidoUseCase = crearPedidoUseCase;
+        this.añadirProductoUseCase = añadirProductoUseCase;
+        this.confirmarPedidoUseCase = confirmarPedidoUseCase;
+        this.cancelarPedidoUseCase = cancelarPedidoUseCase;
     }
 
-    // Ejemplo de endpoint para crear un pedido
+    // 🧾 Crear un nuevo pedido
     @PostMapping
-    public Pedido crearPedido(@RequestParam String cliente) {
-        return crearPedidoUseCase.crearPedido(cliente);
+    public Pedido crearPedido(@RequestParam Long clienteId) {
+        return crearPedidoUseCase.crearPedido(clienteId);
+    }
+
+    // ➕ Añadir un producto al pedido
+    @PostMapping("/{pedidoId}/productos")
+    public void añadirProducto(@PathVariable Long pedidoId,
+                               @RequestParam Long productoId,
+                               @RequestParam int cantidad) {
+        añadirProductoUseCase.añadirProducto(pedidoId, productoId, cantidad);
+    }
+
+    // ✅ Confirmar un pedido
+    @PostMapping("/{pedidoId}/confirmar")
+    public void confirmarPedido(@PathVariable Long pedidoId) {
+        confirmarPedidoUseCase.confirmarPedido(pedidoId);
+    }
+
+    // ❌ Cancelar un pedido
+    @PostMapping("/{pedidoId}/cancelar")
+    public void cancelarPedido(@PathVariable Long pedidoId) {
+        cancelarPedidoUseCase.cancelarPedido(pedidoId);
     }
 }
+
+
 

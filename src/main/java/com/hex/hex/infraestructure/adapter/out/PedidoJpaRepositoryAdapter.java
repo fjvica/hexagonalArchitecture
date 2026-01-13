@@ -1,25 +1,29 @@
 package com.hex.hex.infraestructure.adapter.out;
 
+import com.hex.hex.application.port.out.CargarPedidoPort;
 import com.hex.hex.application.port.out.GuardarPedidoPort;
+import com.hex.hex.domain.model.Cliente;
 import com.hex.hex.domain.model.Pedido;
 import com.hex.hex.infraestructure.repository.PedidoJpaEntity;
 import com.hex.hex.infraestructure.repository.PedidoJpaRepository;
 import org.springframework.stereotype.Component;
 
+
 /**
- * 🔌 ADAPTADOR DE SALIDA (OUTBOUND ADAPTER):
+ * 🔌 Adaptador de salida: PedidoJpaRepositoryAdapter
  *
- * Implementa el puerto de salida (GuardarPedidoPort) usando una tecnología concreta.
+ * Implementa los puertos de salida "GuardarPedidoPort" y "CargarPedidoPort".
  *
- * En este caso, usa Spring Data JPA para acceder a la base de datos.
+ * ▶️ Función:
+ * - Actúa como puente entre el dominio y la base de datos.
+ * - Convierte entre objetos del dominio (Pedido) y entidades JPA (PedidoJpaEntity).
  *
- * Su función es traducir entre el mundo del dominio (Pedido) y
- * el mundo de infraestructura (PedidoJpaEntity).
- *
- * Este adaptador depende de Spring, pero el dominio NO depende de él.
+ * ▶️ Importante:
+ * - Esta clase depende de JPA y Spring (infraestructura).
+ * - El dominio y la aplicación no dependen de ella.
  */
 @Component
-public class PedidoJpaRepositoryAdapter implements GuardarPedidoPort {
+public class PedidoJpaRepositoryAdapter implements GuardarPedidoPort, CargarPedidoPort {
 
     private final PedidoJpaRepository repository;
 
@@ -29,15 +33,39 @@ public class PedidoJpaRepositoryAdapter implements GuardarPedidoPort {
 
     @Override
     public Pedido guardar(Pedido pedido) {
-        // 🔁 Convertir el objeto del dominio a entidad JPA
-        PedidoJpaEntity entity = new PedidoJpaEntity(null, pedido.getCliente(), pedido.getFecha());
+        // 🔁 Convertimos el modelo de dominio en entidad JPA
+        PedidoJpaEntity entity = new PedidoJpaEntity(
+                pedido.getId(),
+                pedido.getCliente().getId(),
+                pedido.getFecha(),
+                pedido.getEstado().name()
+        );
 
-        // 💾 Guardar usando JPA
+        // 💾 Persistimos en la BD
         PedidoJpaEntity saved = repository.save(entity);
 
-        // 🔄 Volver a convertir a modelo de dominio para devolverlo a la aplicación
-        return new Pedido(saved.getId(), saved.getCliente(), saved.getFecha());
+        // 🔄 Convertimos la entidad JPA de nuevo a modelo de dominio
+        return new Pedido(
+                saved.getId(),
+                new Cliente(saved.getClienteId(), "Cliente " + saved.getClienteId(), 0),
+                saved.getFecha()
+        );
+    }
+
+    @Override
+    public Pedido obtenerPorId(Long id) {
+        PedidoJpaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        // 🔄 Transformación inversa: entidad JPA → modelo de dominio
+        return new Pedido(
+                entity.getId(),
+                new Cliente(entity.getClienteId(), "Cliente " + entity.getClienteId(), 0),
+                entity.getFecha()
+        );
     }
 }
+
+
 
 
